@@ -24,6 +24,9 @@
       "dom"
     ],
     "paths": {
+      "search-result": [
+        "./dist/search-result"
+      ],
       "virtual-keyboard": [
         "./dist/virtual-keyboard"
       ]
