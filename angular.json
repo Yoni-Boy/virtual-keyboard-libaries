@@ -35,39 +35,6 @@
           }
         }
       }
-    },
-    "search-result": {
-      "projectType": "library",
-      "root": "projects/search-result",
-      "sourceRoot": "projects/search-result/src",
-      "prefix": "vk",
-      "architect": {
-        "build": {
-          "builder": "@angular-devkit/build-angular:ng-packagr",
-          "options": {
-            "project": "projects/search-result/ng-package.json"
-          },
-          "configurations": {
-            "production": {
-              "tsConfig": "projects/search-result/tsconfig.lib.prod.json"
-            },
-            "development": {
-              "tsConfig": "projects/search-result/tsconfig.lib.json"
-            }
-          },
-          "defaultConfiguration": "production"
-        },
-        "test": {
-          "builder": "@angular-devkit/build-angular:karma",
-          "options": {
-            "tsConfig": "projects/search-result/tsconfig.spec.json",
-            "polyfills": [
-              "zone.js",
-              "zone.js/testing"
-            ]
-          }
-        }
-      }
     }
   },
   "cli": {
