@@ -1,12 +1,12 @@
 import { Component, Input } from '@angular/core';
 import { VirtualKeyboardModule } from "../../virtual-keyboard.module";
-import { KeyboardLayout } from 'virtual-keyboard';
+import { KeyboardLayout} from '../../../public-api';
 
 @Component({
     selector: 'vk-search-result',
     standalone: true,
     templateUrl: './search-result.component.html',
-    styleUrl: './search-result.component.css',
+    styleUrl: './search-result.component.css', 
     imports: [VirtualKeyboardModule]
 })
 export class SearchResultComponent {
@@ -16,7 +16,7 @@ export class SearchResultComponent {
   //This variable declare the virtual keyboard id. 
   //With this parameter we notify the 'acceptWithIDCallBack' with this id param.
   //For example when we declare the call back method at the father, and we click on 'accept' button then we will 
-  //Execute this method with this parameter. With this param We can know who is element    
+  //Execute this method with this parameter. With this param We can know who is element. 
   @Input() vk_id: string | undefined;
   @Input() validateCallBack!: (args: string) => boolean;
   @Input() acceptCallBack!: (args: string) => boolean | void;
