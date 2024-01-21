@@ -1,7 +1,7 @@
 <p>search-result works!</p>
 <vk-virtual-keyboard [language]=language></vk-virtual-keyboard>
 <div #div_search_result>
-<ul class="typeahead typeahead-long dropdown-menu show" style="position:relative;z-index:10000;" *ngIf="searchDB">
+<ul class="typeahead typeahead-long dropdown-menu show" style="position:absolute;z-index:10000;" *ngIf="searchDB">
     <ng-container *ngFor='let item of searchDB;let j = index'>
         <li data-value="'{{item}}'"> 
             <a href = "#" class="dropdown-item btn-lg">

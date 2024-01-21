@@ -1,4 +1,4 @@
-import { Component, ElementRef, Input, ViewChild } from '@angular/core';
+import { Component, ElementRef, HostListener, Input, ViewChild } from '@angular/core';
 import { VirtualKeyboardModule,KeyboardLayout,VirtualKeyboardEventsService } from "../../../public-api";
 import { CommonModule } from '@angular/common';
 
@@ -29,10 +29,11 @@ export class SearchResultComponent {
   constructor(private keyboardEventsService: VirtualKeyboardEventsService) 
   { 
       var that = this;
+      //This event responsible to show search result when We click on accept ket at VK
       this.keyboardEventsService.getAcceptEvent().subscribe(vk => {
         if(that.div_search_result != undefined)
         {
-          that.div_search_result.nativeElement.hidden = true;
+          that.div_search_result.nativeElement.hidden = false;
         }
         if (vk != null) {
           //We show the only focus input keyboard component 
@@ -46,10 +47,10 @@ export class SearchResultComponent {
   }
 
     ngAfterViewInit(): void {
+      this.div_search_result.nativeElement.hidden = true;
       
     }
     ngOnInit(): void {
-      this.div_search_result.nativeElement.hidden = true;
       
       // var that = this;
       // this.keyboardEventsService.getAcceptEvent().subscribe(vk => {
@@ -64,7 +65,10 @@ export class SearchResultComponent {
 
   }
 
-
+  @HostListener('document:click', ['$event']) onDocumentClick(event: Event) {
+    //In the default We wont to hide the search result.
+    this.div_search_result.nativeElement.hidden = true;
+  }
 
 
 }
