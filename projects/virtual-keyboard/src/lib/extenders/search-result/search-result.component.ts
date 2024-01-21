@@ -1,13 +1,13 @@
-import { Component, Input } from '@angular/core';
-import { VirtualKeyboardModule } from "../../virtual-keyboard.module";
-import { KeyboardLayout} from '../../../public-api';
+import { Component, ElementRef, Input, ViewChild } from '@angular/core';
+import { VirtualKeyboardModule,KeyboardLayout,VirtualKeyboardEventsService } from "../../../public-api";
+import { CommonModule } from '@angular/common';
 
 @Component({
     selector: 'vk-search-result',
     standalone: true,
     templateUrl: './search-result.component.html',
     styleUrl: './search-result.component.css', 
-    imports: [VirtualKeyboardModule]
+    imports: [VirtualKeyboardModule,CommonModule]
 })
 export class SearchResultComponent {
 
@@ -21,6 +21,50 @@ export class SearchResultComponent {
   @Input() validateCallBack!: (args: string) => boolean;
   @Input() acceptCallBack!: (args: string) => boolean | void;
   @Input() acceptWithIDCallBack!: (vk_id: string,text: string) => any | void;
+  searchDB: string[] = ['dsadsa','asdasa','aaaaa','vvvvv'];
+  //This value contain the virtual keyboard div 
+  @ViewChild('div_search_result') div_search_result!: ElementRef<HTMLDivElement>;
+
+
+  constructor(private keyboardEventsService: VirtualKeyboardEventsService) 
+  { 
+      var that = this;
+      this.keyboardEventsService.getAcceptEvent().subscribe(vk => {
+        if(that.div_search_result != undefined)
+        {
+          that.div_search_result.nativeElement.hidden = true;
+        }
+        if (vk != null) {
+          //We show the only focus input keyboard component 
+          //alert(vk.vk_id);
+          //alert(vk.input.value);
+        } 
+      });
+      // if(this.div_search_result != undefined)
+      //   this.div_search_result.nativeElement.hidden = true;
+   
+  }
+
+    ngAfterViewInit(): void {
+      
+    }
+    ngOnInit(): void {
+      this.div_search_result.nativeElement.hidden = true;
+      
+      // var that = this;
+      // this.keyboardEventsService.getAcceptEvent().subscribe(vk => {
+      //   that.div_search_result.nativeElement.hidden = false;
+      //   if (vk != null) {
+      //     //We show the only focus input keyboard component 
+      //     //alert(vk.vk_id);
+      //     //alert(vk.input.value);
+      //   } 
+      // });
+      // this.div_search_result.nativeElement.hidden = true;
+
+  }
+
+
 
 
 }
