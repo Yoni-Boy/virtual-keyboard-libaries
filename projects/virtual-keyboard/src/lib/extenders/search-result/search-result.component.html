@@ -3,9 +3,9 @@
 <div #div_search_result>
 <ul class="typeahead typeahead-long dropdown-menu show" style="position:absolute;z-index:10000;" *ngIf="searchDB">
     <ng-container *ngFor='let item of searchDB;let j = index'>
-        <li data-value="'{{item}}'"> 
+        <li data-value="'{{item.text}}'" (click)="onSelectItemClick(item)"> 
             <a href = "#" class="dropdown-item btn-lg">
-                <strong>{{item}}</strong>
+                <strong>{{item.text}}</strong>
             </a>
         </li>
     </ng-container>

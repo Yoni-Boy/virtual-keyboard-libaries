@@ -1,5 +1,5 @@
 import { Component, ElementRef, HostListener, Input, ViewChild } from '@angular/core';
-import { VirtualKeyboardModule,KeyboardLayout,VirtualKeyboardEventsService } from "../../../public-api";
+import { VirtualKeyboardModule,KeyboardLayout,VirtualKeyboardEventsService, SearchResultService,SearchResultItem } from "../../../public-api";
 import { CommonModule } from '@angular/common';
 
 @Component({
@@ -21,12 +21,21 @@ export class SearchResultComponent {
   @Input() validateCallBack!: (args: string) => boolean;
   @Input() acceptCallBack!: (args: string) => boolean | void;
   @Input() acceptWithIDCallBack!: (vk_id: string,text: string) => any | void;
-  searchDB: string[] = ['dsadsa','asdasa','aaaaa','vvvvv'];
+  searchDB: SearchResultItem[] = [
+    {text:'yoni'},
+    {text:'pini'},
+    {text:'roi'},
+    {text:'miri'},
+    {text:'toki'},
+    {text:'shoki'},
+    {text:'moki'}
+  ];
   //This value contain the virtual keyboard div 
   @ViewChild('div_search_result') div_search_result!: ElementRef<HTMLDivElement>;
 
 
-  constructor(private keyboardEventsService: VirtualKeyboardEventsService) 
+  constructor(private keyboardEventsService: VirtualKeyboardEventsService,
+    private searchResultService: SearchResultService) 
   { 
       var that = this;
       //This event responsible to show search result when We click on accept ket at VK
@@ -70,5 +79,10 @@ export class SearchResultComponent {
     this.div_search_result.nativeElement.hidden = true;
   }
 
+  onSelectItemClick(item: SearchResultItem ) {
+    alert('You clicked: ' + item.text);
+    //When We select item click, We trigger the select item event to dispatch this event and capture him in others application
+    this.searchResultService.selectItemEvent(item);
+  }
 
 }
