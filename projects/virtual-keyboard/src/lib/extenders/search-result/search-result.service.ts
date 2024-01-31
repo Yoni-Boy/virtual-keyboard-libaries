@@ -9,8 +9,19 @@ export class SearchResultService {
   
   private selectItemEventSubject = new BehaviorSubject<SearchResultItem | null>(null);
   private displayResultEventSubject = new BehaviorSubject<SearchResultComponent | null>(null);
+  //This for update the 
+  private updateResultEventSubject = new BehaviorSubject<SearchResultItem[] | null>(null);
+
  
   constructor() { }
+
+  updateResultEvent(event: SearchResultItem[]) {
+    this.updateResultEventSubject.next(event);
+  }
+
+  getUpdateResultEvent() {
+    return this.updateResultEventSubject.asObservable();
+  }
 
 
   selectItemEvent(event: SearchResultItem) {
