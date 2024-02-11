@@ -1,13 +1,27 @@
 import { Component, ElementRef, HostListener, Input, ViewChild } from '@angular/core';
-import { VirtualKeyboardModule,KeyboardLayout,VirtualKeyboardEventsService, SearchResultService,SearchResultItem } from "../../../public-api";
-import { CommonModule } from '@angular/common';
+import { KeyboardLayout,VirtualKeyboardEventsService, SearchResultService,SearchResultItem } from "../../../public-api";
 
 @Component({
     selector: 'vk-search-result',
-    standalone: true,
-    templateUrl: './search-result.component.html',
-    styleUrl: './search-result.component.css', 
-    imports: [VirtualKeyboardModule,CommonModule]
+    template: `
+    <p>search-result works!</p>
+    <vk-virtual-keyboard [language]=language [vk_id]="vk_id"></vk-virtual-keyboard>
+    <div #div_search_result [class]="'simple-search-result'">
+    <ul class="typeahead typeahead-long dropdown-menu show" style="position:absolute;z-index:10000;" *ngIf="items">
+        <ng-container *ngFor='let item of items;let j = index'>
+            <li data-value="'{{item.text}}'" (click)="onSelectItemClick(item)"> 
+                <a href = "#" class="dropdown-item btn-lg">
+                    <strong>{{item.text}}</strong>
+                </a>
+            </li>
+        </ng-container>
+    </ul>    
+    </div>
+    `
+    //standalone: true,
+    //templateUrl: './search-result.component.html',
+    //styleUrl: './search-result.component.css', 
+    //imports: [VirtualKeyboardModule,CommonModule]
 })
 export class SearchResultComponent {
 
