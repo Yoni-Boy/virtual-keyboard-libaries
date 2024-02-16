@@ -5,17 +5,17 @@ import { SearchResultItem,SearchResultComponent } from '../../../public-api';
 @Injectable({
   providedIn: 'root'
 })
-export class SearchResultService {
+export class SearchResultService<T> {
   
-  private selectItemEventSubject = new BehaviorSubject<SearchResultItem | null>(null);
-  private displayResultEventSubject = new BehaviorSubject<SearchResultComponent | null>(null);
+  private selectItemEventSubject = new BehaviorSubject<SearchResultItem<T> | null>(null);
+  private displayResultEventSubject = new BehaviorSubject<SearchResultComponent<T> | null>(null);
   //This for update the 
-  private updateResultEventSubject = new BehaviorSubject<SearchResultItem[] | null>(null);
+  private updateResultEventSubject = new BehaviorSubject<SearchResultItem<T>[] | null>(null);
 
  
   constructor() { }
 
-  updateResultEvent(event: SearchResultItem[]) {
+  updateResultEvent(event: SearchResultItem<T>[]) {
     this.updateResultEventSubject.next(event);
   }
 
@@ -24,7 +24,7 @@ export class SearchResultService {
   }
 
 
-  selectItemEvent(event: SearchResultItem) {
+  selectItemEvent(event: SearchResultItem<T>) {
     this.selectItemEventSubject.next(event);
   }
 
@@ -32,7 +32,7 @@ export class SearchResultService {
     return this.selectItemEventSubject.asObservable();
   }
 
-  displaySearchResultEvent(event: SearchResultComponent) {
+  displaySearchResultEvent(event: SearchResultComponent<T>) {
     this.displayResultEventSubject.next(event);
   }
 
