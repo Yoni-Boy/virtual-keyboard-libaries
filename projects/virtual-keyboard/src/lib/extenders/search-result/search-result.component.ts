@@ -1,5 +1,5 @@
 import { Component, ElementRef, HostListener, Input, ViewChild } from '@angular/core';
-import { KeyboardLayout,VirtualKeyboardEventsService, SearchResultService,SearchResultItem, Position } from "../../../public-api";
+import { KeyboardLayout,VirtualKeyboardEventsService, SearchResultService,SearchResultItem, Position, VirtualKeyboardComponent } from "../../../public-api";
 
 @Component({
     selector: 'vk-search-result',
@@ -62,6 +62,10 @@ export class SearchResultComponent<T> {
   //We will do this by listener to 'Accept' event and  catch him,
   //Then We will save the value of the search value right to search_key_value
   search_key_value: string| undefined;
+  //Many times we want to read/write data from the Virtual Keyboard Component 
+  //As for example when We selected an item from the search list,
+  //We want this item to be entered inside the VK input filed
+  vk: VirtualKeyboardComponent | undefined;
 
   constructor(private keyboardEventsService: VirtualKeyboardEventsService,
     private searchResultService: SearchResultService<T>) 
@@ -76,6 +80,9 @@ export class SearchResultComponent<T> {
         {
           //Here We save the search value key from VK to our object 
           that.search_key_value = vk?.input.value;
+          //Here We save the VK that typing to make changes
+          if(vk != null)
+            this.vk = vk;  
           //that.div_search_result.nativeElement.hidden = false;
           searchResultService.displaySearchResultEvent(that);
         }

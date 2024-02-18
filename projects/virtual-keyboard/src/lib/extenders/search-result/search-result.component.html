@@ -4,7 +4,7 @@
 <ul class="typeahead typeahead-long dropdown-menu show"  *ngIf="items">
     <ng-container *ngFor='let item of items;let j = index'>
         <li data-value="'{{item.text}}'" (click)="onSelectItemClick(item)"> 
-            <a href = "#" class="dropdown-item btn-lg">
+            <a  class="dropdown-item btn-lg" ng-click="do(); $event.preventDefault()">
                 <strong>{{item.text}}</strong>
             </a>
         </li>

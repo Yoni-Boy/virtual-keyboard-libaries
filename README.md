@@ -1,7 +1,7 @@
 # Angular Virtual Keyboard
 Hello everyone,
 Our project provides a solution for displaying a virtual keyboard on the screen under the Angular platform
-![Alt text](288179512-e7205426-46a5-47ff-b571-670e6b6a63d6.png)
+![alt text](288179512-e7205426-46a5-47ff-b571-670e6b6a63d6.png)
 ## Development server
 
 Run `ng serve` for a dev server. Navigate to `http://localhost:4200/`. The application will automatically reload if you change any of the source files.
@@ -12,7 +12,7 @@ Run `ng serve` for a dev server. Navigate to `http://localhost:4200/`. The appli
 
 ### 2.  adding  virtual-keyboard-angular packaged in app module and import him:
 ```
-import { VirtualKeyboardModule } from 'yon-yon-virtual-keyboard';
+import { VirtualKeyboardModule } from 'virtual-keyboard-angular';
 
 @NgModule({
   declarations: [ ... ],
