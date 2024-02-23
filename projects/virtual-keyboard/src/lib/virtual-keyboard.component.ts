@@ -1,4 +1,4 @@
-import { AfterViewInit, Component, ElementRef, HostListener, Input, OnInit, Renderer2, ViewChild } from '@angular/core';
+import { AfterViewInit, Component, ElementRef, EventEmitter, HostListener, Input, OnInit, Output, Renderer2, ViewChild } from '@angular/core';
 import { KeyboardLayout, getKeyboardLayout } from './interfaces/keyboards-layout/keyboard-layout';
 import { KeyboardHandlerEvent, KeyboardInput, KeyboardOptions } from './interfaces/interfaces';
 import { Position } from './interfaces/position';
@@ -214,6 +214,7 @@ export class VirtualKeyboardComponent implements OnInit, AfterViewInit {
   //For example when we declare the call back method at the father, and we click on 'accept' button then we will 
   //Execute this method with this parameter. With this param We can know who is element    
   @Input() vk_id: string | undefined;
+
   @Input() validateCallBack!: (args: string) => boolean;
   @Input() acceptCallBack!: (args: string) => boolean | void;
   @Input() acceptWithIDCallBack!: (vk_id: string,text: string) => any | void;
@@ -221,6 +222,10 @@ export class VirtualKeyboardComponent implements OnInit, AfterViewInit {
   @ViewChild('message') _input!: ElementRef<HTMLInputElement>;
   //This value contain the virtual keyboard div 
   @ViewChild('div_keyboard') div_keyboard!: ElementRef<HTMLDivElement>;
+  //https://dev.to/chiangs/how-im-starting-my-own-angular-component-library-part-1---generic-button-3f3m
+  //This event that come from the application, and deal with accept click.
+  //With this event we can declare the method that treatment with this event in the parent app 
+  @Output() acceptClick: EventEmitter<VirtualKeyboardComponent>;
   //This for the keyboard position
   keyboardPosition!: Position;
   //This variable keeps the window size.
@@ -245,6 +250,17 @@ export class VirtualKeyboardComponent implements OnInit, AfterViewInit {
   //Otherwise (if We not passing the validation process) then We need to return back to the previous text.       
   textBeforeAccept: string = '';
 
+  //When we wont to allow initialize the text filed with value, We do that with this variable
+  private value: string | undefined;
+  @Input() set valueFiled(_value: string) {
+    this.value = _value;
+    //Here We check if We need to initialize the VK text filed with value that supply as attribute 
+    //!!! Before We initialize the input text, We need to show if his already create...
+    //This object created when ngAfterViewInit execute --> this.input = <HTMLInputElement>this._input.nativeElement
+    if(this.input != undefined)
+      this.input.value = this.value;
+ }
+ 
   /**
    * Getters
    */
@@ -336,6 +352,8 @@ export class VirtualKeyboardComponent implements OnInit, AfterViewInit {
       x: 0,
       y: 0
     }
+
+    this.acceptClick = new EventEmitter<VirtualKeyboardComponent>();
   }
   ngAfterViewInit(): void {
 
@@ -352,6 +370,12 @@ export class VirtualKeyboardComponent implements OnInit, AfterViewInit {
       accept: this.acceptCallBack,
       accept_with_id: this.acceptWithIDCallBack
     };
+
+
+    //Here We check if We need to initialize the VK text filed with value that supply as attribute 
+    if (this.value != undefined) {
+      this.input.value = this.value;
+    }
 
   }
   ngOnInit(): void {
@@ -790,53 +814,58 @@ export class VirtualKeyboardComponent implements OnInit, AfterViewInit {
     }
     else if (button === "{accept}")
     {
-      //When We click on 'accept' We need to capture this clicking and accept the typing...
-      //if (this.options.validate != null)
-      //  if (this.options.validate(this.input.value)) {
-      //    if (this.options.accept != null) {
-      //      this.options.accept(this.input.value);
-      //    }
-      //  }
-      //  else {
+      // //When We click on 'accept' We need to capture this clicking and accept the typing...
+      // //if (this.options.validate != null)
+      // //  if (this.options.validate(this.input.value)) {
+      // //    if (this.options.accept != null) {
+      // //      this.options.accept(this.input.value);
+      // //    }
+      // //  }
+      // //  else {
 
-      //  }
-      if (this.keyActions.validate != undefined) {
-        if (this.keyActions.validate(this.input.value)) {
-          if (this.keyActions.accept != undefined) {
-            this.keyActions.accept(this.input.value);
-            this.textBeforeAccept = this.input.value;
-            //After WE pass the validation and We make the accept event then We need to hide the virtual keyboard
-            this.div_keyboard.nativeElement.hidden = true; 
-          }
-          else {
-            this.textBeforeAccept = this.input.value;
-            //After WE pass the validation We need to hide the virtual keyboard
-            this.div_keyboard.nativeElement.hidden = true;
-          }
-          if (this.keyActions.accept_with_id != undefined &&  this.vk_id != undefined){ 
-            this.keyActions.accept_with_id(this.vk_id,this.input.value);
-          }
+      // //  }
+      // if (this.keyActions.validate != undefined) {
+      //   if (this.keyActions.validate(this.input.value)) {
+      //     if (this.keyActions.accept != undefined) {
+      //       this.keyActions.accept(this.input.value);
+      //       this.textBeforeAccept = this.input.value;
+      //       //After WE pass the validation and We make the accept event then We need to hide the virtual keyboard
+      //       this.div_keyboard.nativeElement.hidden = true; 
+      //     }
+      //     else {
+      //       this.textBeforeAccept = this.input.value;
+      //       //After WE pass the validation We need to hide the virtual keyboard
+      //       this.div_keyboard.nativeElement.hidden = true;
+      //     }
+      //     if (this.keyActions.accept_with_id != undefined &&  this.vk_id != undefined){ 
+      //       this.keyActions.accept_with_id(this.vk_id,this.input.value);
+      //     }
 
-          this.keyboardEventsService.acceptEvent(this);            
-        }
-        else {
-          //If we failed in validation process then We need to re-back to previous text
-          this.input.value = this.textBeforeAccept;
-          //WE don't hide the virtual keyboard because We don't pass the validation
-        }
-      } 
-      else { //If We don't declare validation then We skipping right to the accept method
-        if (this.keyActions.accept != undefined) {
-          this.keyActions.accept(this.input.value);
-        }
-        if (this.keyActions.accept_with_id != undefined &&  this.vk_id != undefined) {
-        this.keyActions.accept_with_id(this.vk_id,this.input.value);
-        }
-        this.textBeforeAccept = this.input.value;
-        //After WE pass the validation and We make the accept event then We need to hide the virtual keyboard
-        this.div_keyboard.nativeElement.hidden = true;
-        this.keyboardEventsService.acceptEvent(this);            
-      }
+      //     this.keyboardEventsService.acceptEvent(this);            
+      //   }
+      //   else {
+      //     //If we failed in validation process then We need to re-back to previous text
+      //     this.input.value = this.textBeforeAccept;
+      //     //WE don't hide the virtual keyboard because We don't pass the validation
+      //   }
+      // } 
+      // else { //If We don't declare validation then We skipping right to the accept method
+      //   if (this.keyActions.accept != undefined) {
+      //     this.keyActions.accept(this.input.value);
+      //   }
+      //   if (this.keyActions.accept_with_id != undefined &&  this.vk_id != undefined) {
+      //   this.keyActions.accept_with_id(this.vk_id,this.input.value);
+      //   }
+      //   this.textBeforeAccept = this.input.value;
+      //   //After WE pass the validation and We make the accept event then We need to hide the virtual keyboard
+      //   this.div_keyboard.nativeElement.hidden = true;
+      //   this.keyboardEventsService.acceptEvent(this);            
+      // }
+      this.textBeforeAccept = this.input.value;
+      //After WE pass the validation and We make the accept event then We need to hide the virtual keyboard
+      this.div_keyboard.nativeElement.hidden = true;
+      this.keyboardEventsService.acceptEvent(this);  
+      this.acceptClick.emit(this);
     }
     else if (button === "{clear}"){
       this.input.value = "";

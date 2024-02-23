@@ -1,4 +1,4 @@
-import { Component, ElementRef, HostListener, Input, ViewChild } from '@angular/core';
+import { Component, ElementRef, EventEmitter, HostListener, Input, Output, ViewChild } from '@angular/core';
 import { KeyboardLayout,VirtualKeyboardEventsService, SearchResultService,SearchResultItem, Position, VirtualKeyboardComponent } from "../../../public-api";
 
 @Component({
@@ -42,6 +42,10 @@ export class SearchResultComponent<T> {
   @Input() items: SearchResultItem<T>[] |undefined;
   //This value contain the search result div 
   @ViewChild('div_search_result') div_search_result!: ElementRef<HTMLDivElement>;
+  //https://dev.to/chiangs/how-im-starting-my-own-angular-component-library-part-1---generic-button-3f3m
+  //This event that come from the application, and deal with accept click.
+  //With this event we can declare the method that treatment with this event in the parent app 
+  @Output() itemSelectedClick: EventEmitter<SearchResultComponent<T>>;
   //This for the keyboard position
   keyboardPosition!: Position;
   // First of all, you should know that I am dealing with a very complex problem
@@ -110,6 +114,9 @@ export class SearchResultComponent<T> {
         y: 0
       }
 
+
+      this.itemSelectedClick = new EventEmitter<SearchResultComponent<T>>();
+
   }
 
     ngAfterViewInit(): void {
@@ -140,6 +147,7 @@ export class SearchResultComponent<T> {
     //alert('You clicked: ' + item.text);
     //When We select item click, We trigger the select item event to dispatch this event and capture him in others application
     this.searchResultService.selectItemEvent(item);
+    this.itemSelectedClick.emit(this);
   }
 
 
