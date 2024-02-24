@@ -1,5 +1,5 @@
 <p>search-result works!</p>
-<vk-virtual-keyboard [language]=language [vk_id]="vk_id"></vk-virtual-keyboard>
+<vk-virtual-keyboard [language]=language [vk_id]="vk_id" (acceptClick)="VKAcceptClicked($event)"></vk-virtual-keyboard>
 <div #div_search_result [class]="'simple-search-result'" style="position:absolute;z-index:10000;">
 <ul class="typeahead typeahead-long dropdown-menu show"  *ngIf="items">
     <ng-container *ngFor='let item of items;let j = index'>

@@ -43,9 +43,26 @@ export class SearchResultComponent<T> {
   //This value contain the search result div 
   @ViewChild('div_search_result') div_search_result!: ElementRef<HTMLDivElement>;
   //https://dev.to/chiangs/how-im-starting-my-own-angular-component-library-part-1---generic-button-3f3m
+  //This event that come from the application, and deal with item selected click.
+  //With this event we can declare the method that treatment with this event in the parent app 
+  //@Output() itemSelectedClick: EventEmitter<SearchResultComponent<T>>;
+  @Output() itemSelectedClick: EventEmitter<SearchResultItem<T>>;
   //This event that come from the application, and deal with accept click.
   //With this event we can declare the method that treatment with this event in the parent app 
-  @Output() itemSelectedClick: EventEmitter<SearchResultComponent<T>>;
+  //This vkAcceptClick help us to do couple of things,
+  //I will explain why We declare this variable,
+  //We defined the VK (sun) object inside the SVK (parent) object, 
+  //There are some complex problems when defining an object inside an object and that is how to transfer variables as attributes to the sub-object (sun), 
+  //Just non-complex variables I can simply define in the parent object and then pass them as parameters to the child object.
+  //For example:
+  //<vk-virtual-keyboard [language]=language [vk_id]="vk_id"></vk-virtual-keyboard>
+  //We define @Input variables like 'language' in the same name in the parent and his child,  
+  //But when I want to transfer a method (acceptClick)=... how do I do it ?,
+  // I tried and failed, and only in the following way that I will explain I succeeded and that is:
+  //In the child object we defined a parameter that behaves as an event: @Output() acceptClick: EventEmitter<VirtualKeyboardComponent>,
+  // and also in the parent object I defined a parameter that behaves as an event:   @Output() vkAcceptClick: EventEmitter<VirtualKeyboardComponent>  
+  //Inside the parent we will define a method that handles the child event and all it does is dispatch to the application level of the event
+  @Output() vkAcceptClick: EventEmitter<VirtualKeyboardComponent>;  
   //This for the keyboard position
   keyboardPosition!: Position;
   // First of all, you should know that I am dealing with a very complex problem
@@ -115,7 +132,9 @@ export class SearchResultComponent<T> {
       }
 
 
-      this.itemSelectedClick = new EventEmitter<SearchResultComponent<T>>();
+      //this.itemSelectedClick = new EventEmitter<SearchResultComponent<T>>();
+      this.itemSelectedClick = new EventEmitter<SearchResultItem<T>>();
+      this.vkAcceptClick = new EventEmitter<VirtualKeyboardComponent>();
 
   }
 
@@ -147,9 +166,12 @@ export class SearchResultComponent<T> {
     //alert('You clicked: ' + item.text);
     //When We select item click, We trigger the select item event to dispatch this event and capture him in others application
     this.searchResultService.selectItemEvent(item);
-    this.itemSelectedClick.emit(this);
+    //this.itemSelectedClick.emit(this);
+    this.itemSelectedClick.emit(item);
   }
-
+  VKAcceptClicked(event: VirtualKeyboardComponent): void {
+    this.vkAcceptClick.emit(event);
+  }
 
 // /**
 //    * This method responsible to calculate the virtual keyboard location.
