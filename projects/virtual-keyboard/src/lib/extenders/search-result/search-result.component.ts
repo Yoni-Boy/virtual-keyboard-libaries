@@ -60,9 +60,9 @@ export class SearchResultComponent<T> {
   //But when I want to transfer a method (acceptClick)=... how do I do it ?,
   // I tried and failed, and only in the following way that I will explain I succeeded and that is:
   //In the child object we defined a parameter that behaves as an event: @Output() acceptClick: EventEmitter<VirtualKeyboardComponent>,
-  // and also in the parent object I defined a parameter that behaves as an event:   @Output() vkAcceptClick: EventEmitter<VirtualKeyboardComponent>  
+  // and also in the parent object I defined a parameter that behaves as an event:   @Output() vkAcceptClick: EventEmitter<SearchResultComponent<T>>  
   //Inside the parent we will define a method that handles the child event and all it does is dispatch to the application level of the event
-  @Output() vkAcceptClick: EventEmitter<VirtualKeyboardComponent>;  
+  @Output() vkAcceptClick: EventEmitter<SearchResultComponent<T>>;  
   //This for the keyboard position
   keyboardPosition!: Position;
   // First of all, you should know that I am dealing with a very complex problem
@@ -134,7 +134,7 @@ export class SearchResultComponent<T> {
 
       //this.itemSelectedClick = new EventEmitter<SearchResultComponent<T>>();
       this.itemSelectedClick = new EventEmitter<SearchResultItem<T>>();
-      this.vkAcceptClick = new EventEmitter<VirtualKeyboardComponent>();
+      this.vkAcceptClick = new EventEmitter<SearchResultComponent<T>>();
 
   }
 
@@ -170,7 +170,8 @@ export class SearchResultComponent<T> {
     this.itemSelectedClick.emit(item);
   }
   VKAcceptClicked(event: VirtualKeyboardComponent): void {
-    this.vkAcceptClick.emit(event);
+    this.vk = event;
+    this.vkAcceptClick.emit(this);
   }
 
 // /**

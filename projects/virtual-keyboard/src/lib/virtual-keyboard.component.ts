@@ -17,6 +17,7 @@ import { VirtualKeyboardEventsService } from './services/virtual-keyboard-events
            (touchend)="handleTouchEnd($event)"
            (select)="handleSelect($event)"
            (focusout)="handleFocusOut($event)"
+           (focus)="handleFocusIn($event)"
            (selectionchange)="handleSelectionChange($event)" />
 
   </div>
@@ -437,6 +438,22 @@ export class VirtualKeyboardComponent implements OnInit, AfterViewInit {
 
 
   @HostListener('document:click', ['$event']) onDocumentClick(event: Event) {
+    //There can be problem before We hide the VK, the problem is:
+    //When we edit the input text but We don't click on 'accept', And we dispatch 'document:click' event, We wont
+    //To prevent editing the VK input text without accepting, because when We declare accept method, We don't make any
+    //text change without making accept before. 
+    //All we need to do is:
+    //this.input.value = this.textBeforeAccept;
+    //A better solution. Before I will just explain that when performing:
+    //document:click
+    //All VKs will respond, even those that are already closed and not displayed. 
+    //Therefore, if we want to allow a change of the text even without clicking 'accept',
+    //We will be able to know about the changes and respond accordingly. 
+    //When a 'document:click' event occurred I will see which of the VK is 'hidden = true',
+    //Then I will trigger a "acceptClick.emit(this)" event and at the application level I can catch this event and respond accordingly
+    //But don't forget to make validation to this text before you accept him, if there is validation method
+    if(this.div_keyboard.nativeElement.hidden == false && this.input.value != this.textBeforeAccept)
+      this.startAcceptingProcess();
     //In the default We wont to hide the keyboard, And When We focus on the text input We wont to show the keyboard.
     this.div_keyboard.nativeElement.hidden = true;
   }
@@ -861,11 +878,8 @@ export class VirtualKeyboardComponent implements OnInit, AfterViewInit {
       //   this.div_keyboard.nativeElement.hidden = true;
       //   this.keyboardEventsService.acceptEvent(this);            
       // }
-      this.textBeforeAccept = this.input.value;
-      //After WE pass the validation and We make the accept event then We need to hide the virtual keyboard
-      this.div_keyboard.nativeElement.hidden = true;
-      this.keyboardEventsService.acceptEvent(this);  
-      this.acceptClick.emit(this);
+
+      this.startAcceptingProcess();
     }
     else if (button === "{clear}"){
       this.input.value = "";
@@ -878,7 +892,7 @@ export class VirtualKeyboardComponent implements OnInit, AfterViewInit {
       output = this.addStringAt(output, "-", ...commonParams);
     else if (button === "{numpadadd}")
       output = this.addStringAt(output, "+", ...commonParams);
-    else if (button === "{numpaddecimal}")
+    else if (button === "{numpaddecimal}" || button === "{dec}")
       output = this.addStringAt(output, ".", ...commonParams);
     else if (button === "{" || button === "}")
       output = this.addStringAt(output, button, ...commonParams);
@@ -1479,7 +1493,13 @@ export class VirtualKeyboardComponent implements OnInit, AfterViewInit {
       //this.physicalKeyboard.handleHighlightKeyDown(event);
     }
   }
-
+  /**
+   * Event Handler: Focus in, When we click on input and we focus in then we execute this method
+   */
+  handleFocusIn(event: KeyboardHandlerEvent): void {
+    //We select the all text at the input field  
+    <HTMLInputElement>event.target.select();
+  }
 
   /**
    * Event Handler: MouseUp
@@ -1651,7 +1671,39 @@ export class VirtualKeyboardComponent implements OnInit, AfterViewInit {
     return this.div_keyboard.nativeElement.getBoundingClientRect().height;
   }
 
-
+  /**
+   * This method execute when we typing on VK and We making 'accept' or we dispatch 'document:click'.
+   * This method responsible to making the validation process if his declare and to modify the new input text  
+   */
+  startAcceptingProcess()
+  {
+    if (this.keyActions.validate != undefined) {
+      if (this.keyActions.validate(this.input.value)) {
+        this.textBeforeAccept = this.input.value;
+        //!!!!! We wont to make focus out from the input text after we click on 'accept'. I don't know how to do that
+        
+        //After WE pass the validation and We make the accept event then We need to hide the virtual keyboard
+        this.div_keyboard.nativeElement.hidden = true;
+        this.keyboardEventsService.acceptEvent(this);  
+        this.acceptClick.emit(this);             
+      }
+      else {
+        //If we failed in validation process then We need to re-back to previous text
+        this.input.value = this.textBeforeAccept;
+        alert('There is problem with value');
+        //WE don't hide the virtual keyboard because We don't pass the validation
+      }
+    } 
+    else { //If We don't declare validation then We skipping right to the accept method
+      
+      this.textBeforeAccept = this.input.value;
+      //After WE pass the validation and We make the accept event then We need to hide the virtual keyboard
+      this.div_keyboard.nativeElement.hidden = true;
+      this.keyboardEventsService.acceptEvent(this);  
+      this.acceptClick.emit(this);
+      
+    }
+  }
 
 	// Action key function list
   //Instead to use with this object, We create new interface 'KeyActions' that need to implementation the all key actions 
