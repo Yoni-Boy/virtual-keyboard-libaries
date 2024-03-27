@@ -21,9 +21,11 @@ import { VirtualKeyboardEventsService } from './services/virtual-keyboard-events
            (selectionchange)="handleSelectionChange($event)" />
 
   </div>
+  </div>
+
   <div #div_keyboard [class]="keyboard_css" data-skinstance="simpleKeyboard" *ngIf="keyboardLayout"
-       [style.x.px]="keyboardPosition.x"
-             [style.y.px]="keyboardPosition.y">
+       [style.left.px]="keyboardPosition.x"
+             [style.top.px]="keyboardPosition.y">
     <div class="hg-rows">
       <div class="hg-row" *ngFor='let row_layout of keyboardLayout.default; let i = index'>
         <ng-container *ngFor='let bbb of row_layout.split(" ");let j = index'>
@@ -34,7 +36,6 @@ import { VirtualKeyboardEventsService } from './services/virtual-keyboard-events
       </div>
     </div>
   </div>
-</div>
 
   `,
   styles: [` 
@@ -162,7 +163,7 @@ import { VirtualKeyboardEventsService } from './services/virtual-keyboard-events
 .ui-keyboard {
   text-align: center;
   padding: .3em;
-  position: absolute;
+  position: fixed;
   /*left: 0;
   top: 0;*/
   z-index: 16000;
@@ -321,7 +322,8 @@ export class VirtualKeyboardComponent implements OnInit, AfterViewInit {
   self = this;
 
 
-  constructor(private renderer: Renderer2, private keyboardEventsService: VirtualKeyboardEventsService) {
+  constructor(private renderer: Renderer2, private keyboardEventsService: VirtualKeyboardEventsService,
+    private elementRef: ElementRef) {
 
     this.caretPosition = 0;
     this.caretPositionEnd = 0;
@@ -436,8 +438,12 @@ export class VirtualKeyboardComponent implements OnInit, AfterViewInit {
 
   }
 
-
-  @HostListener('document:click', ['$event']) onDocumentClick(event: Event) {
+  //https://www.c-sharpcorner.com/article/how-to-detect-event-on-clicks-outside-in-angular-application/
+  @HostListener('document: click', ['$event.target']) onMouseEnter(targetElement:any) {
+    //the 'elementRef' contain the VK element. 
+    //When we click on some of the document We will check if We click outside from the VK.
+    const clickInside = this.elementRef.nativeElement.contains(targetElement);
+    if (!clickInside) { //If We click outside the VK then 
     //There can be problem before We hide the VK, the problem is:
     //When we edit the input text but We don't click on 'accept', And we dispatch 'document:click' event, We wont
     //To prevent editing the VK input text without accepting, because when We declare accept method, We don't make any
@@ -454,9 +460,34 @@ export class VirtualKeyboardComponent implements OnInit, AfterViewInit {
     //But don't forget to make validation to this text before you accept him, if there is validation method
     if(this.div_keyboard.nativeElement.hidden == false && this.input.value != this.textBeforeAccept)
       this.startAcceptingProcess();
-    //In the default We wont to hide the keyboard, And When We focus on the text input We wont to show the keyboard.
-    this.div_keyboard.nativeElement.hidden = true;
+      //In the default We wont to hide the keyboard, And When We focus on the text input We wont to show the keyboard.
+      this.div_keyboard.nativeElement.hidden = true;
+    }
   }
+
+
+  //!!!! this not work so well, because when i click on some of the key in the VK, this event will trigger up
+  //     And We will hide this VK  that the reason we create the code above to check if we click outside the element
+  // @HostListener('document:click', ['$event']) onDocumentClick(event: Event) {
+  //   //There can be problem before We hide the VK, the problem is:
+  //   //When we edit the input text but We don't click on 'accept', And we dispatch 'document:click' event, We wont
+  //   //To prevent editing the VK input text without accepting, because when We declare accept method, We don't make any
+  //   //text change without making accept before. 
+  //   //All we need to do is:
+  //   //this.input.value = this.textBeforeAccept;
+  //   //A better solution. Before I will just explain that when performing:
+  //   //document:click
+  //   //All VKs will respond, even those that are already closed and not displayed. 
+  //   //Therefore, if we want to allow a change of the text even without clicking 'accept',
+  //   //We will be able to know about the changes and respond accordingly. 
+  //   //When a 'document:click' event occurred I will see which of the VK is 'hidden = true',
+  //   //Then I will trigger a "acceptClick.emit(this)" event and at the application level I can catch this event and respond accordingly
+  //   //But don't forget to make validation to this text before you accept him, if there is validation method
+  //   if(this.div_keyboard.nativeElement.hidden == false && this.input.value != this.textBeforeAccept)
+  //     this.startAcceptingProcess();
+  //   //In the default We wont to hide the keyboard, And When We focus on the text input We wont to show the keyboard.
+  //   this.div_keyboard.nativeElement.hidden = true;
+  // }
 
   @HostListener('window:resize', ['$event'])
   onWindowResize() {
@@ -1604,15 +1635,24 @@ export class VirtualKeyboardComponent implements OnInit, AfterViewInit {
    calculationPosition(): void {
     console.log("Width/Height = ", this.getScreenWidth + ',' + this.getScreenHeight);
     console.log("VK_Width/VK_Height = ", this.getVK_Width() + ',' + this.getVK_Height());
+    console.log("input.y=",this._input.nativeElement.getBoundingClientRect().y);
+    console.log("input.x=",this._input.nativeElement.getBoundingClientRect().x);
+    console.log("input.top=",this._input.nativeElement.getBoundingClientRect().top);
+    console.log("input.left=",this._input.nativeElement.getBoundingClientRect().left);
+    console.log("input.width=",this._input.nativeElement.getBoundingClientRect().width);
+    console.log("input.height=",this._input.nativeElement.getBoundingClientRect().height);
+
+
 
     //By the default, in the regular state We show the virtual keyboard below the input text 
    if((this._input.nativeElement.getBoundingClientRect().y + this._input.nativeElement.getBoundingClientRect().height + this.getVK_Height()) <= this.getScreenHeight)
    { 
+      //this.keyboardPosition.y = this._input.nativeElement.getBoundingClientRect().y - this._input.nativeElement.getBoundingClientRect().height ;
       this.keyboardPosition.y = this._input.nativeElement.getBoundingClientRect().y + this._input.nativeElement.getBoundingClientRect().height;
-      //alert('1:' + this.keyboardPosition.y);
-    }
+   }
    else //We show the virtual keyboard above the input text 
    { 
+      //this.keyboardPosition.y = this._input.nativeElement.getBoundingClientRect().y - this._input.nativeElement.getBoundingClientRect().height - this.getVK_Height();
       this.keyboardPosition.y = this._input.nativeElement.getBoundingClientRect().y - this.getVK_Height();
       //alert('2:' + this.keyboardPosition.y);
    } 
