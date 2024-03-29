@@ -216,7 +216,10 @@ export class VirtualKeyboardComponent implements OnInit, AfterViewInit {
   //For example when we declare the call back method at the father, and we click on 'accept' button then we will 
   //Execute this method with this parameter. With this param We can know who is element    
   @Input() vk_id: string | undefined;
-
+  //Usually the user uses VK as it is, that is, he adds the VK component directly to his application and it also includes a text box,
+  //However, there are times when the user defines his own text box and therefore wants the VK component to know how to work with his text box. In such a situation when the user defines his own text box for him, we will make sure to make our text box disappear from the VK component and we will have to define all the events for the user's text box
+  //This is the variable that pass as attribute and contain the external input text.
+  @Input() text_input_element!: HTMLInputElement;
   @Input() validateCallBack!: (args: string) => boolean;
   @Input() acceptCallBack!: (args: string) => boolean | void;
   @Input() acceptWithIDCallBack!: (vk_id: string,text: string) => any | void;
@@ -359,8 +362,35 @@ export class VirtualKeyboardComponent implements OnInit, AfterViewInit {
     this.acceptClick = new EventEmitter<VirtualKeyboardComponent>();
   }
   ngAfterViewInit(): void {
-
+    //Usually the user uses VK as it is, that is, he adds the VK component directly to his application and it also includes a text box,
     this.input = <HTMLInputElement>this._input.nativeElement;
+    //if the user defines his own text box and therefore wants us to add the VK on it.
+    //In such a situation when the user defines his own text box for the VK, 
+    //we will make sure to make our text box disappear and we will have to define all the events for the user's text box
+    if(this.text_input_element != undefined)
+    {  
+      //We need to declare the events for the external text input
+      //  (keyup)="handleKeyUp($event)"
+      //  (keydown)="handleKeyDown($event)"
+      //  (mouseup)="handleMouseUp($event)"
+      //  (touchend)="handleTouchEnd($event)"
+      //  (select)="handleSelect($event)"
+      //  (focusout)="handleFocusOut($event)"
+      //  (focus)="handleFocusIn($event)"
+      //  (selectionchange)="handleSelectionChange($event)" 
+      this.text_input_element.addEventListener('keyup', this.handleKeyUp.bind(this));
+      this.text_input_element.addEventListener('keydown', this.handleKeyDown.bind(this));
+      this.text_input_element.addEventListener('mouseup', this.handleMouseUp.bind(this));
+      this.text_input_element.addEventListener('touchend', this.handleTouchEnd.bind(this));
+      this.text_input_element.addEventListener('select', this.handleSelect.bind(this));
+      this.text_input_element.addEventListener('focusout', this.handleFocusOut.bind(this));
+      this.text_input_element.addEventListener('focus', this.handleFocusIn.bind(this));
+      this.text_input_element.addEventListener('selectionchange', this.handleSelectionChange.bind(this));
+      //We need to hide the 'message' input element, because if the user pass as attribute external text input
+      //We need to work on him and We need to disable the 'message' element.
+      this._input.nativeElement.hidden = true;
+      this.input = this.text_input_element;
+    }
     //In the default We wont to hide the keyboard, And When We focus on the text input We wont to show the keyboard.
     this.div_keyboard.nativeElement.hidden = true;
 
@@ -1633,37 +1663,27 @@ export class VirtualKeyboardComponent implements OnInit, AfterViewInit {
    * Its all depend in the input text element position on the page.  
    */
    calculationPosition(): void {
-    console.log("Width/Height = ", this.getScreenWidth + ',' + this.getScreenHeight);
-    console.log("VK_Width/VK_Height = ", this.getVK_Width() + ',' + this.getVK_Height());
-    console.log("input.y=",this._input.nativeElement.getBoundingClientRect().y);
-    console.log("input.x=",this._input.nativeElement.getBoundingClientRect().x);
-    console.log("input.top=",this._input.nativeElement.getBoundingClientRect().top);
-    console.log("input.left=",this._input.nativeElement.getBoundingClientRect().left);
-    console.log("input.width=",this._input.nativeElement.getBoundingClientRect().width);
-    console.log("input.height=",this._input.nativeElement.getBoundingClientRect().height);
-
-
-
+    
     //By the default, in the regular state We show the virtual keyboard below the input text 
-   if((this._input.nativeElement.getBoundingClientRect().y + this._input.nativeElement.getBoundingClientRect().height + this.getVK_Height()) <= this.getScreenHeight)
+   if((this.input.getBoundingClientRect().y + this.input.getBoundingClientRect().height + this.getVK_Height()) <= this.getScreenHeight)
    { 
       //this.keyboardPosition.y = this._input.nativeElement.getBoundingClientRect().y - this._input.nativeElement.getBoundingClientRect().height ;
-      this.keyboardPosition.y = this._input.nativeElement.getBoundingClientRect().y + this._input.nativeElement.getBoundingClientRect().height;
+      this.keyboardPosition.y = this.input.getBoundingClientRect().y + this.input.getBoundingClientRect().height;
    }
    else //We show the virtual keyboard above the input text 
    { 
       //this.keyboardPosition.y = this._input.nativeElement.getBoundingClientRect().y - this._input.nativeElement.getBoundingClientRect().height - this.getVK_Height();
-      this.keyboardPosition.y = this._input.nativeElement.getBoundingClientRect().y - this.getVK_Height();
+      this.keyboardPosition.y = this.input.getBoundingClientRect().y - this.getVK_Height();
       //alert('2:' + this.keyboardPosition.y);
    } 
    //After We located the Y coordinate We need to calculate the X coordinate. 
-   if((this._input.nativeElement.getBoundingClientRect().x + this.getVK_Width()) < this.getScreenWidth)
+   if((this.input.getBoundingClientRect().x + this.getVK_Width()) < this.getScreenWidth)
    {
-    this.keyboardPosition.x = this._input.nativeElement.getBoundingClientRect().x;
+    this.keyboardPosition.x = this.input.getBoundingClientRect().x;
    }
    else //We show the virtual keyboard above the input text 
     {
-      this.keyboardPosition.x =  this._input.nativeElement.getBoundingClientRect().x - this.getVK_Width();
+      this.keyboardPosition.x =  this.input.getBoundingClientRect().x - this.getVK_Width();
     }
   }
   /**
