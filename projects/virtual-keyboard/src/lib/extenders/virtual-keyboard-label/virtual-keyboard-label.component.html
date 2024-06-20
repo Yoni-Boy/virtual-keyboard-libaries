@@ -1,0 +1,14 @@
+<vk-virtual-keyboard  [language]=language [vk_dir]="vk_dir" [vk_id]="vk_id"  
+[vk_is_visible]="vk_is_visible" [vk_is_readonly]="vk_is_readonly" 
+[valueFiled]="value_filed" (acceptClick)="VKAcceptClicked($event)" [is_display_text_input]="is_display_text_input"></vk-virtual-keyboard>
+<div [hidden]="is_display_text_input == true? true: false" (click)="handleKeyUp($event)" >
+     {{value_filed}}   
+</div>
+
+
+<!-- <vk-virtual-keyboard #xxx [language]=language [vk_dir]="vk_dir" [vk_id]="vk_id"  
+[vk_is_visible]="vk_is_visible" [vk_is_readonly]="vk_is_readonly" 
+[valueFiled]="value_filed"  [is_display_text_input]="is_display_text_input"></vk-virtual-keyboard>
+<div [hidden]="!is_display_text_input" >
+     {{value_filed}}   
+</div> -->

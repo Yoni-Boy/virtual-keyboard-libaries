@@ -30,6 +30,11 @@ export class SearchResultComponent<T> {
   //This variable declare the input text direction ('rtl','ltr')
   //The user can setting the input text direction 
   @Input() vk_dir: string = "ltr";
+    //This variable declare us if we display the VK or not
+  //For example if we have external keyboard and we don't wont the VK then we will set the variable to 'false'
+  @Input() vk_is_visible: boolean = true;
+  //This variable declare the input text if he readonly or not 
+  @Input() vk_is_readonly: boolean = false;
   //This variable declare the virtual keyboard id. 
   //With this parameter we notify the 'acceptWithIDCallBack' with this id param.
   //For example when we declare the call back method at the father, and we click on 'accept' button then we will 

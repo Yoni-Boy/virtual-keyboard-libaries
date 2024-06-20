@@ -9,8 +9,8 @@ import { VirtualKeyboardEventsService } from './services/virtual-keyboard-events
   selector: 'vk-virtual-keyboard',
   template: `
   <div (click)="$event.stopPropagation()">
-  <div>
-    <input #message type="text" name="message" [dir]="vk_dir" value="" style="width:100%;"
+  <div [hidden]="is_display_text_input == true ? false : true">
+    <input #message type="text" name="message" [dir]="vk_dir" [readOnly]="vk_is_readonly" value="" style="width:100%;"
            (keyup)="handleKeyUp($event)"
            (keydown)="handleKeyDown($event)"
            (mouseup)="handleMouseUp($event)"
@@ -23,7 +23,7 @@ import { VirtualKeyboardEventsService } from './services/virtual-keyboard-events
   </div>
   </div>
 
-  <div #div_keyboard [class]="keyboard_css" data-skinstance="simpleKeyboard" *ngIf="keyboardLayout"
+  <div #div_keyboard [class]="keyboard_css" dir="ltr" data-skinstance="simpleKeyboard" *ngIf="keyboardLayout && vk_is_visible"
        [style.left.px]="keyboardPosition.x"
              [style.top.px]="keyboardPosition.y">
     <div class="hg-rows">
@@ -141,6 +141,7 @@ import { VirtualKeyboardEventsService } from './services/virtual-keyboard-events
   .hg-theme-default .hg-button.hg-standardBtn.hg-button-at {
     max-width: 45px;
   }
+  
 
   .hg-theme-default .hg-button.hg-selectedButton {
     background: rgba(5, 25, 70, 0.53);
@@ -214,6 +215,14 @@ export class VirtualKeyboardComponent implements OnInit, AfterViewInit {
   //This variable declare the input text direction ('rtl','ltr')
   //The user can setting the input text direction 
   @Input() vk_dir: string = "ltr";
+  //This variable declare the input text if We completely remove this element from the DOM tree. (true,false)
+  //The user can setting the input text displaying  
+  @Input() is_display_text_input: boolean = true;
+  //This variable declare us if we display the VK or not
+  //For example if we have external keyboard and we don't wont the VK then we will set the variable to 'false'
+  @Input() vk_is_visible: boolean = true;
+  //This variable declare the input text if he readonly or not 
+  @Input() vk_is_readonly: boolean = false;
   //This variable declare the virtual keyboard id. 
   //With this parameter we notify the 'acceptWithIDCallBack' with this id param.
   //For example when we declare the call back method at the father, and we click on 'accept' button then we will 
@@ -1552,6 +1561,10 @@ export class VirtualKeyboardComponent implements OnInit, AfterViewInit {
     //alert('handleKeyDown');
     if (this.options.physicalKeyboardHighlight) {
       //this.physicalKeyboard.handleHighlightKeyDown(event);
+    }
+    if (event.keyCode === 13) {
+      this.startAcceptingProcess();
+      // rest of your code
     }
   }
   /**

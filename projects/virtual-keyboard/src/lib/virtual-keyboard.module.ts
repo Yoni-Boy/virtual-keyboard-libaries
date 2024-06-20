@@ -7,20 +7,23 @@ import { SearchResultComponent } from './extenders/search-result/search-result.c
 import {VirtualKeyboardEventsService} from './services/virtual-keyboard-events.service';
 import { SearchResultService } from './extenders/search-result/search-result.service';
 import { CommonModule } from '@angular/common';
+import { VirtualKeyboardLabelComponent } from './extenders/virtual-keyboard-label/virtual-keyboard-label.component';
 
 
 
 @NgModule({
   declarations: [
     VirtualKeyboardComponent,
-    SearchResultComponent
+    SearchResultComponent,
+    VirtualKeyboardLabelComponent
   ],
   imports: [
     CommonModule
   ],
   exports: [
     VirtualKeyboardComponent,
-    SearchResultComponent
+    SearchResultComponent,
+    VirtualKeyboardLabelComponent
   ],
   providers: [VirtualKeyboardEventsService,SearchResultService]
 })

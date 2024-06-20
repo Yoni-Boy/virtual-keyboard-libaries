@@ -1,4 +1,4 @@
-<vk-virtual-keyboard [language]=language [vk_dir]="vk_dir" [vk_id]="vk_id" [valueFiled]="value_filed" (acceptClick)="VKAcceptClicked($event)"></vk-virtual-keyboard>
+<vk-virtual-keyboard [language]=language [vk_dir]="vk_dir" [vk_id]="vk_id" [vk_is_visible]="vk_is_visible" [vk_is_readonly]="vk_is_readonly" [valueFiled]="value_filed" (acceptClick)="VKAcceptClicked($event)"></vk-virtual-keyboard>
 <div #div_search_result [class]="'simple-search-result'" style="position:absolute;z-index:10000;">
 <ul class="typeahead typeahead-long dropdown-menu show"  *ngIf="items">
     <ng-container *ngFor='let item of items;let j = index'>

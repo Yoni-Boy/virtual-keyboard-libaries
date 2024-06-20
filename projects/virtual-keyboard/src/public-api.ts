@@ -13,3 +13,5 @@ export * from './lib/services/virtual-keyboard-events.service';
 export * from './lib/virtual-keyboard.module';
 export * from './lib/extenders/search-result/search-result.component';
 export * from './lib/extenders/search-result/search-result.service';
+export * from './lib/extenders/virtual-keyboard-label/virtual-keyboard-label.component';
+
